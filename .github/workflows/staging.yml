@@ -1,0 +1,24 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main  # Deploy to staging when merging into develop
+
+jobs:
+  deploy:
+    name: Deploy to Staging Server
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Staging
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.STAGING_SERVER_IP }} \
+          "cd /app && git pull origin develop && systemctl restart app"
